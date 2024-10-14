@@ -1,0 +1,6 @@
+"Read","1000","329","mongo"
+"Read","1000","344","postgres"
+"Read","1","67","postgres"
+"Update","1","17","postgres"
+"Delete","1","248","postgres"
+"Create","1","22","postgres"
