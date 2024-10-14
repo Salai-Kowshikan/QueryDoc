@@ -1,56 +1,36 @@
 package com.DBTest.DBTest.entity;
 
 import jakarta.persistence.*;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "daily_coal_stocks")
-@Document(collection = "daily_coal_stocks")
-public class Record {
+public class PostgresRecord {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDate date;
-
-    @Field("state_name")
     private String stateName;
-    @Field("state_code")
     private String stateCode;
-    @Field("mode_of_transport")
     private String modeOfTransport;
-    @Field("power_station_name")
     private String powerStationName;
     private String sector;
     private String utility;
-    @Field("capacity_in_mw")
     private Double capacityInMw;
-    @Field("req_for_day_in_th_tonnes")
     private Double reqForDayInThTonnes;
-    @Field("normative_stock_req_days")
     private Double normativeStockReqDays;
-    @Field("normative_stock_req_in_th_tonnes")
     private Double normativeStockReqInThTonnes;
-    @Field("actual_stock_indigenous_in_th_tonnes")
     private Double actualStockIndigenousInThTonnes;
-    @Field("actual_stock_import_in_th_tonnes")
     private Double actualStockImportInThTonnes;
-    @Field("actual_stock_total_in_th_tonnes")
     private Double actualStockTotalInThTonnes;
-    @Field("actual_stock_days")
     private Double actualStockDays;
-    @Field("percentage_of_actual_stock_vs_normative_stock")
     private String percentageOfActualStockVsNormativeStock;
-    @Field("receipt_for_day_in_th_tonnes")
     private String receiptForDayInThTonnes;
-    @Field("consumption_for_day_in_th_tonnes")
     private String consumptionForDayInThTonnes;
-    @Field("critical_or_sup_critical")
     private String criticalOrSupCritical;
-    @Field("reasons_for_critical_remarks")
     private String reasonsForCriticalRemarks;
 
     public Long getId() {

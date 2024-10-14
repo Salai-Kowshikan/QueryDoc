@@ -1,7 +1,6 @@
 package com.DBTest.DBTest.service;
 
-import com.DBTest.DBTest.entity.Record;
-import com.DBTest.DBTest.repository.Postgres.PostgresRepository;
+import com.DBTest.DBTest.entity.MongoRecord;
 import com.DBTest.DBTest.repository.mongo.MongoRecordRepository;
 import com.DBTest.DBTest.util.CsvLogger;
 import org.springframework.beans.BeanWrapper;
@@ -16,54 +15,48 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class CoalRecordServiceImpl implements CoalRecordService {
+public class MongoRecordServiceImpl implements MongoRecordService {
 
-    private final PostgresRepository postgresRepository;
     private final MongoRecordRepository mongoRecordRepository;
 
     @Autowired
-    public CoalRecordServiceImpl(PostgresRepository postgresRepository, MongoRecordRepository mongoRecordRepository) {
-        this.postgresRepository = postgresRepository;
+    public MongoRecordServiceImpl(MongoRecordRepository mongoRecordRepository) {
         this.mongoRecordRepository = mongoRecordRepository;
     }
 
     @Override
-    public List<Record> getAllRecords(String dbType, int page) {
+    public List<MongoRecord> getAllRecords(int page) {
         long startTime = System.currentTimeMillis();
-        List<Record> records;
-        if ("mongo".equalsIgnoreCase(dbType)) {
-            records = mongoRecordRepository.findAllWithoutId(PageRequest.of(page, 1000)).getContent();
-        } else {
-            records = postgresRepository.findAll(PageRequest.of(page, 1000)).getContent();
-        }
+        List<MongoRecord> records = mongoRecordRepository.findAllWithoutId(PageRequest.of(page, 10000)).getContent();
         long endTime = System.currentTimeMillis();
-        CsvLogger.logQuery("Read", records.size(), endTime - startTime, dbType);
+        CsvLogger.logQuery("Read", records.size(), endTime - startTime, "mongo");
         return records;
     }
 
     @Override
-    public List<Record> getRecordsByDateRange(LocalDate startDate, LocalDate endDate) {
+    public List<MongoRecord> getRecordsByStateName(int page, String stateName) {
         long startTime = System.currentTimeMillis();
-        List<Record> records = postgresRepository.findByDateBetween(startDate, endDate);
+        List<MongoRecord> records = mongoRecordRepository.findByStateName(stateName, PageRequest.of(page, 10000)).getContent();
         long endTime = System.currentTimeMillis();
-        CsvLogger.logQuery("Read", records.size(), endTime - startTime, "postgres");
+        CsvLogger.logQuery("Read", records.size(), endTime - startTime, "mongo");
         return records;
     }
 
     @Override
-    public Record saveRecord(Record record) {
+    public MongoRecord saveRecord(MongoRecord record) {
         long startTime = System.currentTimeMillis();
-        Record savedRecord = postgresRepository.save(record);
+        record.setDate(LocalDate.now());
+        MongoRecord savedRecord = mongoRecordRepository.save(record);
         long endTime = System.currentTimeMillis();
-        CsvLogger.logQuery("Create", 1, endTime - startTime, "postgres");
+        CsvLogger.logQuery("Create", 1, endTime - startTime, "mongo");
         return savedRecord;
     }
 
     @Override
     @Transactional
-    public Record updateRecord(Long id, Map<String, Object> updates) {
+    public MongoRecord updateRecord(String id, Map<String, Object> updates) {
         long startTime = System.currentTimeMillis();
-        Record record = postgresRepository.findById(id)
+        MongoRecord record = mongoRecordRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Record not found"));
 
         BeanWrapper beanWrapper = new BeanWrapperImpl(record);
@@ -73,21 +66,21 @@ public class CoalRecordServiceImpl implements CoalRecordService {
             }
         });
 
-        Record updatedRecord = postgresRepository.save(record);
+        MongoRecord updatedRecord = mongoRecordRepository.save(record);
         long endTime = System.currentTimeMillis();
-        CsvLogger.logQuery("Update", 1, endTime - startTime, "postgres");
+        CsvLogger.logQuery("Update", 1, endTime - startTime, "mongo");
         return updatedRecord;
     }
 
     @Override
     @Transactional
-    public void deleteRecord(Long id) {
+    public void deleteRecord(String id) {
         long startTime = System.currentTimeMillis();
-        if (!postgresRepository.existsById(id)) {
+        if (!mongoRecordRepository.existsById(id)) {
             throw new IllegalArgumentException("Record not found");
         }
-        postgresRepository.deleteById(id);
+        mongoRecordRepository.deleteById(id);
         long endTime = System.currentTimeMillis();
-        CsvLogger.logQuery("Delete", 1, endTime - startTime, "postgres");
+        CsvLogger.logQuery("Delete", 1, endTime - startTime, "mongo");
     }
 }

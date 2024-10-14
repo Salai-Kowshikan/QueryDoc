@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 
 @Configuration
@@ -24,6 +25,20 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     @Override
     public MongoClient mongoClient() {
         return MongoClients.create("mongodb://localhost:27017");
+    }
+
+    static class LocalDateToStringConverter implements Converter<LocalDate, String> {
+        @Override
+        public String convert(LocalDate source) {
+            return source.toString();
+        }
+    }
+
+    static class StringToLocalDateConverter implements Converter<String, LocalDate> {
+        @Override
+        public LocalDate convert(String source) {
+            return LocalDate.parse(source);
+        }
     }
 
     @Bean
