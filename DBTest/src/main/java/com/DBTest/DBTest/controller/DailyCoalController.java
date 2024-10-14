@@ -22,8 +22,8 @@ public class DailyCoalController {
     }
 
     @GetMapping
-    public List<Record> getAllRecords(@RequestParam(defaultValue = "0") int page) {
-        return coalRecordService.getAllRecords(page);
+    public List<Record> getAllRecords(@RequestParam(defaultValue = "postgres") String dbType, @RequestParam int page) {
+        return coalRecordService.getAllRecords(dbType, page);
     }
 
     @GetMapping("/by_date")

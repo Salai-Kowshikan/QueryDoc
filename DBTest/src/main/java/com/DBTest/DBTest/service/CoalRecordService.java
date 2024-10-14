@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.Map;
 
 public interface CoalRecordService {
-    List<Record> getAllRecords(int page);
+    List<Record> getAllRecords(String dbType, int page);
     List<Record> getRecordsByDateRange(LocalDate startDate, LocalDate endDate);
     Record saveRecord(Record record);
     Record updateRecord(Long id, Map<String, Object> updates);

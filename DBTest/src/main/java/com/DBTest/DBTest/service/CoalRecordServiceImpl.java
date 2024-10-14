@@ -1,7 +1,8 @@
 package com.DBTest.DBTest.service;
 
 import com.DBTest.DBTest.entity.Record;
-import com.DBTest.DBTest.repository.CoalRepository;
+import com.DBTest.DBTest.repository.Postgres.PostgresRepository;
+import com.DBTest.DBTest.repository.mongo.MongoRecordRepository;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,32 +17,39 @@ import java.util.Map;
 @Service
 public class CoalRecordServiceImpl implements CoalRecordService {
 
-    private final CoalRepository coalRepository;
+    private final PostgresRepository postgresRepository;
+    private final MongoRecordRepository mongoRecordRepository;
 
     @Autowired
-    public CoalRecordServiceImpl(CoalRepository coalRepository) {
-        this.coalRepository = coalRepository;
+    public CoalRecordServiceImpl(PostgresRepository postgresRepository, MongoRecordRepository mongoRecordRepository) {
+        this.postgresRepository = postgresRepository;
+        this.mongoRecordRepository = mongoRecordRepository;
+
     }
 
     @Override
-    public List<Record> getAllRecords(int page) {
-        return coalRepository.findAll(PageRequest.of(page, 1000)).getContent();
+    public List<Record> getAllRecords(String dbType, int page) {
+        if ("mongo".equalsIgnoreCase(dbType)) {
+            return mongoRecordRepository.findAllWithoutId(PageRequest.of(page, 1000)).getContent();
+        } else {
+            return postgresRepository.findAll(PageRequest.of(page, 1000)).getContent();
+        }
     }
 
     @Override
     public List<Record> getRecordsByDateRange(LocalDate startDate, LocalDate endDate) {
-        return coalRepository.findByDateBetween(startDate, endDate);
+        return postgresRepository.findByDateBetween(startDate, endDate);
     }
 
     @Override
     public Record saveRecord(Record record) {
-        return coalRepository.save(record);
+        return postgresRepository.save(record);
     }
 
     @Override
     @Transactional
     public Record updateRecord(Long id, Map<String, Object> updates) {
-        Record record = coalRepository.findById(id)
+        Record record = postgresRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Record not found"));
 
         BeanWrapper beanWrapper = new BeanWrapperImpl(record);
@@ -51,15 +59,15 @@ public class CoalRecordServiceImpl implements CoalRecordService {
             }
         });
 
-        return coalRepository.save(record);
+        return postgresRepository.save(record);
     }
 
     @Override
     @Transactional
     public void deleteRecord(Long id) {
-        if (!coalRepository.existsById(id)) {
+        if (!postgresRepository.existsById(id)) {
             throw new IllegalArgumentException("Record not found");
         }
-        coalRepository.deleteById(id);
+        postgresRepository.deleteById(id);
     }
 }
