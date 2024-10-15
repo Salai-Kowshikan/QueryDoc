@@ -25,36 +25,36 @@ public class MongoRecordServiceImpl implements MongoRecordService {
     }
 
     @Override
-    public List<MongoRecord> getAllRecords(int page) {
+    public List<MongoRecord> getAllRecords(int page, String queryId) {
         long startTime = System.currentTimeMillis();
         List<MongoRecord> records = mongoRecordRepository.findAllWithoutId(PageRequest.of(page, 10000)).getContent();
         long endTime = System.currentTimeMillis();
-        CsvLogger.logQuery("Read", records.size(), endTime - startTime, "mongo");
+        CsvLogger.logQuery("Read", records.size(), endTime - startTime, "mongo", queryId);
         return records;
     }
 
     @Override
-    public List<MongoRecord> getRecordsByStateName(int page, String stateName) {
+    public List<MongoRecord> getRecordsByStateName(int page, String stateName, String queryId) {
         long startTime = System.currentTimeMillis();
         List<MongoRecord> records = mongoRecordRepository.findByStateName(stateName, PageRequest.of(page, 10000)).getContent();
         long endTime = System.currentTimeMillis();
-        CsvLogger.logQuery("Read", records.size(), endTime - startTime, "mongo");
+        CsvLogger.logQuery("Read", records.size(), endTime - startTime, "mongo", queryId);
         return records;
     }
 
     @Override
-    public MongoRecord saveRecord(MongoRecord record) {
+    public MongoRecord saveRecord(MongoRecord record, String queryId) {
         long startTime = System.currentTimeMillis();
         record.setDate(LocalDate.now());
         MongoRecord savedRecord = mongoRecordRepository.save(record);
         long endTime = System.currentTimeMillis();
-        CsvLogger.logQuery("Create", 1, endTime - startTime, "mongo");
+        CsvLogger.logQuery("Create", 1, endTime - startTime, "mongo", queryId);
         return savedRecord;
     }
 
     @Override
     @Transactional
-    public MongoRecord updateRecord(String id, Map<String, Object> updates) {
+    public MongoRecord updateRecord(String id, Map<String, Object> updates, String queryId) {
         long startTime = System.currentTimeMillis();
         MongoRecord record = mongoRecordRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Record not found"));
@@ -68,19 +68,19 @@ public class MongoRecordServiceImpl implements MongoRecordService {
 
         MongoRecord updatedRecord = mongoRecordRepository.save(record);
         long endTime = System.currentTimeMillis();
-        CsvLogger.logQuery("Update", 1, endTime - startTime, "mongo");
+        CsvLogger.logQuery("Update", 1, endTime - startTime, "mongo", queryId);
         return updatedRecord;
     }
 
     @Override
     @Transactional
-    public void deleteRecord(String id) {
+    public void deleteRecord(String id, String queryId) {
         long startTime = System.currentTimeMillis();
         if (!mongoRecordRepository.existsById(id)) {
             throw new IllegalArgumentException("Record not found");
         }
         mongoRecordRepository.deleteById(id);
         long endTime = System.currentTimeMillis();
-        CsvLogger.logQuery("Delete", 1, endTime - startTime, "mongo");
+        CsvLogger.logQuery("Delete", 1, endTime - startTime, "mongo", queryId);
     }
 }
