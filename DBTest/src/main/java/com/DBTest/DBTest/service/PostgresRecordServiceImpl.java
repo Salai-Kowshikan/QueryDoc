@@ -24,35 +24,35 @@ public class PostgresRecordServiceImpl implements PostgresRecordService {
     }
 
     @Override
-    public List<PostgresRecord> getAllRecords(int page) {
+    public List<PostgresRecord> getAllRecords(int page, String queryId) {
         long startTime = System.currentTimeMillis();
         List<PostgresRecord> records = postgresRepository.findAll(PageRequest.of(page, 10000)).getContent();
         long endTime = System.currentTimeMillis();
-        CsvLogger.logQuery("Read", records.size(), endTime - startTime, "postgres");
+        CsvLogger.logQuery("Read", records.size(), endTime - startTime, "postgres", queryId);
         return records;
     }
 
     @Override
-    public List<PostgresRecord> getRecordsByStateName(int page, String stateName) {
+    public List<PostgresRecord> getRecordsByStateName(int page, String stateName, String queryId) {
         long startTime = System.currentTimeMillis();
         List<PostgresRecord> records = postgresRepository.findByStateName(stateName, PageRequest.of(page, 10000)).getContent();
         long endTime = System.currentTimeMillis();
-        CsvLogger.logQuery("Read", records.size(), endTime - startTime, "postgres");
+        CsvLogger.logQuery("Read", records.size(), endTime - startTime, "postgres", queryId);
         return records;
     }
 
     @Override
-    public PostgresRecord saveRecord(PostgresRecord record) {
+    public PostgresRecord saveRecord(PostgresRecord record, String queryId) {
         long startTime = System.currentTimeMillis();
         PostgresRecord savedRecord = postgresRepository.save(record);
         long endTime = System.currentTimeMillis();
-        CsvLogger.logQuery("Create", 1, endTime - startTime, "postgres");
+        CsvLogger.logQuery("Create", 1, endTime - startTime, "postgres", queryId);
         return savedRecord;
     }
 
     @Override
     @Transactional
-    public PostgresRecord updateRecord(Long id, Map<String, Object> updates) {
+    public PostgresRecord updateRecord(Long id, Map<String, Object> updates, String queryId) {
         long startTime = System.currentTimeMillis();
         PostgresRecord record = postgresRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Record not found"));
@@ -66,19 +66,19 @@ public class PostgresRecordServiceImpl implements PostgresRecordService {
 
         PostgresRecord updatedRecord = postgresRepository.save(record);
         long endTime = System.currentTimeMillis();
-        CsvLogger.logQuery("Update", 1, endTime - startTime, "postgres");
+        CsvLogger.logQuery("Update", 1, endTime - startTime, "postgres", queryId);
         return updatedRecord;
     }
 
     @Override
     @Transactional
-    public void deleteRecord(Long id) {
+    public void deleteRecord(Long id, String queryId) {
         long startTime = System.currentTimeMillis();
         if (!postgresRepository.existsById(id)) {
             throw new IllegalArgumentException("Record not found");
         }
         postgresRepository.deleteById(id);
         long endTime = System.currentTimeMillis();
-        CsvLogger.logQuery("Delete", 1, endTime - startTime, "postgres");
+        CsvLogger.logQuery("Delete", 1, endTime - startTime, "postgres", queryId);
     }
 }
