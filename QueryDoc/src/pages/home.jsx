@@ -45,7 +45,7 @@ function Home() {
             <Button
               className="bg-white text-black hover:bg-black hover:text-white hover:border-2 hover:border-white font-bold py-2 px-4 rounded transition duration-300"
             >
-              View Report
+              View Summary
             </Button>
           </a>
           <Button
@@ -58,7 +58,7 @@ function Home() {
         </div>
       </div>
 
-      <div id="report" className="w-full py-20 px-4 bg-gray-900">
+      <div id="report" className="w-full py-20 px-24 bg-gray-900">
         <Report />
       </div>
     </div>
