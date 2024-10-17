@@ -7,9 +7,11 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -80,5 +82,57 @@ public class PostgresRecordServiceImpl implements PostgresRecordService {
         postgresRepository.deleteById(id);
         long endTime = System.currentTimeMillis();
         CsvLogger.logQuery("Delete", 1, endTime - startTime, "postgres", queryId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PostgresRecord> getLastRecords(int count, String queryId) {
+        long startTime = System.currentTimeMillis();
+        List<PostgresRecord> records = postgresRepository.findAll(PageRequest.of(0, count, Sort.by(Sort.Direction.DESC, "date"))).getContent();
+        long endTime = System.currentTimeMillis();
+        CsvLogger.logQuery("Read", records.size(), endTime - startTime, "postgres", queryId);
+        return records;
+    }
+
+    @Override
+    @Transactional
+    public List<PostgresRecord> updateLastRecords(Map<String, Object> updates, String queryId) {
+        long startTime = System.currentTimeMillis();
+        List<PostgresRecord> recordsToUpdate = postgresRepository.findAll(PageRequest.of(0, 10000, Sort.by(Sort.Direction.DESC, "date"))).getContent();
+        List<PostgresRecord> updatedRecords = new ArrayList<>();
+
+        for (PostgresRecord record : recordsToUpdate) {
+            BeanWrapper beanWrapper = new BeanWrapperImpl(record);
+            updates.forEach((key, value) -> {
+                if (beanWrapper.isWritableProperty(key)) {
+                    beanWrapper.setPropertyValue(key, value);
+                }
+            });
+            updatedRecords.add(postgresRepository.save(record));
+        }
+
+        long endTime = System.currentTimeMillis();
+        CsvLogger.logQuery("Update", recordsToUpdate.size(), endTime - startTime, "postgres", queryId);
+        return updatedRecords;
+    }
+
+    @Override
+    @Transactional
+    public void deleteLastRecords(int count, String queryId) {
+        long startTime = System.currentTimeMillis();
+        List<PostgresRecord> recordsToDelete = postgresRepository.findAll(PageRequest.of(0, count, Sort.by(Sort.Direction.DESC, "date"))).getContent();
+        postgresRepository.deleteAll(recordsToDelete);
+        long endTime = System.currentTimeMillis();
+        CsvLogger.logQuery("Delete", recordsToDelete.size(), endTime - startTime, "postgres", queryId);
+    }
+
+    @Override
+    @Transactional
+    public List<PostgresRecord> insertRecords(List<PostgresRecord> records, String queryId) {
+        long startTime = System.currentTimeMillis();
+        List<PostgresRecord> insertedRecords = postgresRepository.saveAll(records);
+        long endTime = System.currentTimeMillis();
+        CsvLogger.logQuery("Insert", insertedRecords.size(), endTime - startTime, "postgres", queryId);
+        return insertedRecords;
     }
 }

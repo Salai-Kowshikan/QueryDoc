@@ -29,9 +29,9 @@ public class MongoController {
     }
 
     @PostMapping
-    public MongoRecord addRecord(@RequestBody MongoRecord record, @RequestParam String queryId) {
-        record.setDate(LocalDate.now());
-        return mongoRecordService.saveRecord(record, queryId);
+    public List<MongoRecord> addRecords(@RequestBody List<MongoRecord> records, @RequestParam String queryId) {
+        records.forEach(record -> record.setDate(LocalDate.now()));
+        return mongoRecordService.saveRecords(records, queryId);
     }
 
     @PutMapping("/{id}")
@@ -39,8 +39,30 @@ public class MongoController {
         return mongoRecordService.updateRecord(id, updates, queryId);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteRecord(@PathVariable String id, @RequestParam String queryId) {
-        mongoRecordService.deleteRecord(id, queryId);
+    @DeleteMapping("/bulk")
+    public void deleteLastRecords(@RequestParam int count, @RequestParam String queryId) {
+        mongoRecordService.deleteLastRecords(count, queryId);
+    }
+
+    @PutMapping("/bulk")
+    public List<MongoRecord> updateRecords(@RequestBody List<Map<String, Object>> updates, @RequestParam String queryId) {
+        return mongoRecordService.updateRecords(updates, queryId);
+    }
+
+    @PutMapping("/bulk/last")
+    public List<MongoRecord> updateLastRecords(@RequestBody Map<String, Object> updates, @RequestParam String queryId) {
+        return mongoRecordService.updateLastRecords(updates, queryId);
+    }
+
+    @GetMapping("/bulk/last")
+    public List<MongoRecord> getLastRecords(@RequestParam int count, @RequestParam String queryId) {
+        return mongoRecordService.getLastRecords(count, queryId);
+    }
+
+    @PutMapping("/bulk/search-update")
+    public List<MongoRecord> searchAndUpdateRecords(@RequestBody Map<String, Map<String, Object>> request, @RequestParam String queryId) {
+        Map<String, Object> findCriteria = request.get("find");
+        Map<String, Object> updateFields = request.get("update");
+        return mongoRecordService.searchAndUpdateRecords(findCriteria, updateFields, queryId);
     }
 }

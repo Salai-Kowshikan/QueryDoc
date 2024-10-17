@@ -10,4 +10,8 @@ public interface PostgresRecordService {
     PostgresRecord saveRecord(PostgresRecord record, String queryId);
     PostgresRecord updateRecord(Long id, Map<String, Object> updates, String queryId);
     void deleteRecord(Long id,String queryId);
+    List<PostgresRecord> getLastRecords(int count, String queryId);
+    List<PostgresRecord> updateLastRecords(Map<String, Object> updates, String queryId);
+    void deleteLastRecords(int count, String queryId);
+    List<PostgresRecord> insertRecords(List<PostgresRecord> records, String queryId);
 }

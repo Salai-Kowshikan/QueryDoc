@@ -24,7 +24,7 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     @Bean
     @Override
     public MongoClient mongoClient() {
-        return MongoClients.create("mongodb://localhost:27017");
+        return MongoClients.create("mongodb://localhost:27030");
     }
 
     static class LocalDateToStringConverter implements Converter<LocalDate, String> {

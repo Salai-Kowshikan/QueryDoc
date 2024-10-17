@@ -46,4 +46,24 @@ public class PostgresController {
     public void deleteRecord(@PathVariable Long id, @RequestParam String queryId) {
         postgresRecordService.deleteRecord(id, queryId);
     }
+
+    @GetMapping("/bulk/last")
+    public List<PostgresRecord> getLastRecords(@RequestParam int count, @RequestParam String queryId) {
+        return postgresRecordService.getLastRecords(count, queryId);
+    }
+
+    @PutMapping("/bulk/last")
+    public List<PostgresRecord> updateLastRecords(@RequestBody Map<String, Object> updates, @RequestParam String queryId) {
+        return postgresRecordService.updateLastRecords(updates, queryId);
+    }
+
+    @DeleteMapping("/bulk/last")
+    public void deleteLastRecords(@RequestParam int count, @RequestParam String queryId) {
+        postgresRecordService.deleteLastRecords(count, queryId);
+    }
+
+    @PostMapping("/bulk")
+    public List<PostgresRecord> insertRecords(@RequestBody List<PostgresRecord> records, @RequestParam String queryId) {
+        return postgresRecordService.insertRecords(records, queryId);
+    }
 }
