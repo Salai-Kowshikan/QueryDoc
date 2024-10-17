@@ -12,14 +12,14 @@ function Home() {
     <div className="flex flex-col items-center bg-black text-white min-h-screen">
       {/* Landing Section */}
       <div className="flex flex-col items-center justify-center h-screen p-4">
-        <h1 className="text-6xl font-bold mb-4">Query
+        <h1 className="text-7xl font-bold mb-4">Query
             <span className="text-[#2196F3]">Doc</span></h1>
-        <p className="text-lg mb-8 text-center max-w-xl">
+        <p className="text-2xl mb-8 text-center max-w-3xl">
           Dive into comprehensive database analysis with ease.
         </p>
-        <div>Analyze databases like:</div>
+        <p className="text-md">Analyze databases like:</p>
 
-        <div className="mb-8 text-2xl font-semibold text-[#2196F3]">
+        <div className="mb-8 text-4xl font-semibold text-[#2196F3]">
           <TypeAnimation
             sequence={[
               "PostgreSQL",
@@ -50,7 +50,7 @@ function Home() {
           </a>
           <Button
             className="bg-black text-white border-2 border-white hover:bg-white hover:text-black font-bold py-2 px-4 rounded flex items-center transition duration-300"
-            onClick={() => navigate("/overall")}
+            onClick={() =>window.open("https://docs.google.com/document/d/1HxsUPBW-tZWcvOfD439J3N275X8aFv7GYKv9UtPfWU8/edit?usp=sharing")}
           >
             <FaDownload className="mr-2" />
             Download Doc

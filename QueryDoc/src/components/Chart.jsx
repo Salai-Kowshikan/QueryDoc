@@ -22,6 +22,14 @@ const chartConfig = {
     label: "PostgreSQL",
     color: "#2196F3",
   },
+  sharded_mongo: {
+    label: "Sharded MongoDB",
+    color: "#0514eb",
+  },
+  cassandra: {
+    label: "Cassandra",
+    color: "#8cb8ff",
+  },
 };
 
 const CustomTooltip = ({ active, payload }) => {
@@ -32,6 +40,8 @@ const CustomTooltip = ({ active, payload }) => {
         <p className="font-semibold">{`Records: ${payload[0].payload.no_of_records}`}</p>
         <p className="">{`${chartConfig.mongo.label}: ${payload[0].value} ms`}</p>
         <p className="">{`${chartConfig.postgres.label}: ${payload[1].value} ms`}</p>
+        <p className="" > {`${chartConfig.sharded_mongo.label}:${payload[2].value}ms`}</p>
+        <p className="" > {`${chartConfig.cassandra.label}:${payload[3].value}ms`}</p>
       </div>
     );
   }
@@ -50,6 +60,8 @@ export default function Chart({ operationType }) {
             qid: qid,
             mongo: 0,
             postgres: 0,
+            sharded_mongo: 0,
+            cassandra: 0,
           };
         }
 
@@ -57,6 +69,12 @@ export default function Chart({ operationType }) {
           acc[qid].mongo = item.time;
         } else if (item.db === "postgres") {
           acc[qid].postgres = item.time;
+        }
+        else if (item.db === "sharded_mongo") {
+          acc[qid].sharded_mongo = item.time;
+        }
+        else if (item.db === "cassandra") {
+          acc[qid].cassandra = item.time;
         }
         return acc;
       }, {});
@@ -92,6 +110,18 @@ export default function Chart({ operationType }) {
               dataKey="postgres"
               name="PostgreSQL Time"
               fill={chartConfig.postgres.color}
+              radius={4}
+            />
+            <Bar
+              dataKey="sharded_mongo"
+              name="Sharded MongoDB Time"
+              fill={chartConfig.sharded_mongo.color}
+              radius={4}
+            />
+            <Bar
+              dataKey="cassandra"
+              name="Cassandra Time"
+              fill={chartConfig.cassandra.color}
               radius={4}
             />
           </BarChart>
