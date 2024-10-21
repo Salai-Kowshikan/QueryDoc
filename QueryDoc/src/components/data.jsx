@@ -107,7 +107,7 @@ export let data = [
     {
         "operation_type": "Update",
         "no_of_records": 10000,
-        "time":4256 ,
+        "time":101800 ,
         "db": "cassandra",
         "qid": 4
     },
